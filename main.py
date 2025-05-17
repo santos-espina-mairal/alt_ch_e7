@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Response
 from fastapi.responses import JSONResponse, HTMLResponse
+import random
 
 app = FastAPI()
 
@@ -11,17 +12,20 @@ system_codes = {
     "deflector_shield": "SHLD-05"
 }
 
+# Global variable to store last damaged system
+last_damaged_system = {"name": None}
+
 
 @app.get("/status")
 def get_status():
-    # damaged_system = random.choice(list(system_codes.keys()))
-    return {"damaged_system": "navigation"}
+    damaged_system = random.choice(list(system_codes.keys()))
+    last_damaged_system["name"] = damaged_system
+    return {"damaged_system": damaged_system}
 
 
 @app.get("/repair-bay")
 def repair_bay():
-
-    damaged_system = "navigation"  # Default fallback
+    damaged_system = last_damaged_system.get("name") or "unknown"
     code = system_codes.get(damaged_system, "UNKNOWN")
     html_content = f"""
     <!DOCTYPE html>
